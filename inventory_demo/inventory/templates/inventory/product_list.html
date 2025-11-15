@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inventory Management</title>
+</head>
+<body>
+  <h1>Inventory</h1>
+  <a href="{% url 'product_create' %}">➕ Add New Product</a>
+  <br><br>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>Name</th><th>Quantity</th><th>Price</th><th>Description</th><th>Actions</th>
+    </tr>
+    {% for p in products %}
+    <tr>
+      <td>{{ p.name }}</td>
+      <td>{{ p.quantity }}</td>
+      <td>{{ p.price }}</td>
+      <td>{{ p.description}}</td>
+      <td>
+        <a href="{% url 'product_update' p.id %}">Edit</a> |
+        <a href="{% url 'product_delete' p.id %}">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No products found.</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

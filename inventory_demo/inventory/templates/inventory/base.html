@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+</head>
+<body>
+    <div id="nav">
+        <a href="#">Home</a>
+        <a href="{% url 'product_create' %}">➕ Add New Product</a>
+        <a href="#">Contacts</a>
+    </div>
+
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">
+        {% block footer %}
+        &copy; Copyright 2008 by <a href="#">Me</a>.
+        {% endblock %}
+    </div>
+</body>
+</html>
