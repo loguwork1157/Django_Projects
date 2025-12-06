@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product
+from .forms import ProductForm
 
 # Show all products
 def product_list(request):
@@ -12,6 +13,7 @@ def product_list(request):
 # Add new product using manual HTML form
 def product_create(request):
     if request.method == 'POST':
+
         user_name = request.POST.get('name')
         quantity = request.POST.get('quantity')
         user_price = request.POST.get('price')
@@ -24,9 +26,9 @@ def product_create(request):
             description=description
         )
         return redirect('product_list')
-
-    return render(request, 'inventory/product_form.html')
-
+    else:
+        form = ProductForm()
+    return render(request, 'inventory/product_form.html', {'form': form})
 
 # Edit an existing product
 def product_update(request, pk):
