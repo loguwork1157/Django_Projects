@@ -1,5 +1,7 @@
 from django import forms
+from .models import Product
 
-class ProductForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    name2 = forms.CharField(max_length=100)
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'quantity', 'price', 'description']
