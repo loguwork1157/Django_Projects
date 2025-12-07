@@ -10,10 +10,11 @@
 
   <table border="1" cellpadding="6">
     <tr>
-      <th>Name</th><th>Quantity</th><th>Price</th><th>Description</th><th>Actions</th>
+      <th>ID</th><th>Name</th><th>Quantity</th><th>Price</th><th>Description</th><th>Actions</th>
     </tr>
     {% for p in products %}
     <tr>
+      <td>{{ p.id }}</td>
       <td>{{ p.name }}</td>
       <td>{{ p.quantity }}</td>
       <td>{{ p.price }}</td>
