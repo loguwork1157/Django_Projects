@@ -1,21 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <link rel="stylesheet" href="style.css" />
-    <title>{% block title %}{% endblock %} - My Webpage</title>
-</head>
-<body>
-    <div id="nav">
-        <a href="#">Home</a>
-        <a href="{% url 'product_create' %}">➕ Add New Product</a>
-        <a href="#">Contacts</a>
-    </div>
 
-    <div id="content">{% block content %}{% endblock %}</div>
-    <div id="footer">
-        {% block footer %}
-        &copy; Copyright 2008 by <a href="#">Me</a>.
-        {% endblock %}
-    </div>
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="{% static 'style.css' %}" />
+  <title>{% block title %}Inventory{% endblock %}</title>
+</head>
+
+<body>
+  <div id="nav">
+    <a class="button" href="{% url 'product_list' %}">Home</a>
+    {% if user.is_authenticated %}
+    <a class="button" href="{% url 'product_create' %}">➕ Add New Product</a>
+    <span> | Hello, {{ user.username }}</span>
+    <a class="button" href="{% url 'logout' %}">Logout</a>
+    {% else %}
+    <a class="button" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+    <a class="button" href="{% url 'signup' %}">Signup</a>
+    {% endif %}
+  </div>
+
+
+  {# Show Django messages (success/info/error) #}
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div id="content">{% block content %}{% endblock %}</div>
+  <div id="footer">
+    {% block footer %}&copy; My Webpage{% endblock %}
+  </div>
 </body>
+
 </html>

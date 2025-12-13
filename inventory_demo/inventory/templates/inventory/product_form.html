@@ -1,15 +1,28 @@
-<!DOCTYPE html>
+{% extends "inventory/base.html" %}
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %}{% endblock %}
+{% block content %}
+<h2>{% if product %}Edit{% else %}Add{% endif %} Product</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<a class="button" href="{% url 'product_list' %}">Back</a>
+{% endblock %}
+
 <html>
+
 <head>
   <title>Product Form</title>
 </head>
+
 <body>
   <h2>{% if product %}Edit{% else %}Add{% endif %} Product</h2>
-  
+
   <form method="post">
     {% csrf_token %}
-    
-   {{ form.as_p }}
+
+    {{ form.as_p }}
 
     <button type="submit">Save</button>
   </form>
@@ -17,4 +30,5 @@
   <br>
   <a href="{% url 'product_list' %}">Back</a>
 </body>
+
 </html>
