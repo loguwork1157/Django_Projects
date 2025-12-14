@@ -1,4 +1,6 @@
 import logging
+from django.core.paginator import Paginator
+from django.core.cache import cache
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout
@@ -13,10 +15,30 @@ logger = logging.getLogger('inventory')
 
 # Show all products
 def product_list(request):
-    # Existing product list view remains unchanged
-    products = Product.objects.all()
-    logger.info("Product list viewed by %s", request.user if request.user.is_authenticated else 'anonymous')
-    return render(request, 'inventory/product_list.html', {'products': products})
+    # Session: Track visits to this page
+    visit_count = request.session.get('visit_count', 0) + 1
+    request.session['visit_count'] = visit_count
+
+    # Caching: Try to get products from cache first
+    products = cache.get('all_products')
+    if not products:
+        products = Product.objects.all()
+        # Cache the queryset for 15 minutes
+        cache.set('all_products', products, 60 * 15)
+
+    # Pagination: Show 5 products per page
+    paginator = Paginator(products, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    logger.info("Product list viewed by %s (Visit count: %d)", 
+                request.user if request.user.is_authenticated else 'anonymous', 
+                visit_count)
+    
+    return render(request, 'inventory/product_list.html', {
+        'page_obj': page_obj,
+        'visit_count': visit_count
+    })
 
 
 # Add new product using manual HTML form (login required)
@@ -77,15 +99,44 @@ def signup(request):
             user_logged = auth_login(request, user)
             if user_logged is None:
                 logger.info("Logged in Successfully: %s", user.username)
+            logger.info("testing.... loggged in Successfully: %s", user.username)
             messages.success(request, "Welcome, your account was created.")
             return redirect('product_list')
     else:
         form = SignupForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+def login_view(request):
+    """Custom login view to handle user login."""
+    from django.contrib.auth.forms import AuthenticationForm
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            logger.info("Testing User logged in: %s", user.username)
+            messages.success(request, "You have been logged in.")
+            return redirect('product_list')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'inventory/login.html', {'form': form})
+
 # Custom logout view
 def logout_view(request):
     """Log out the user and redirect to product list with a message."""
     auth_logout(request)
     messages.info(request, "You have been logged out.")
+    return redirect('product_list')
+
+def set_session_name(request):
+    if request.method == 'POST':
+        custom_name = request.POST.get('custom_name')
+        if custom_name:
+            request.session['custom_name'] = custom_name
+            messages.success(request, f"Session name updated to {custom_name}")
+        else:
+            # clear it if empty
+            if 'custom_name' in request.session:
+                del request.session['custom_name']
+                messages.success(request, "Session name cleared")
     return redirect('product_list')

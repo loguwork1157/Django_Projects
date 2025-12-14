@@ -20,10 +20,5 @@ from inventory import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', include('inventory.urls')),
-    path('', views.product_list, name='product_list'),
-    path('add/', views.product_create, name='product_create'),
-    path('edit/<int:pk>/', views.product_update, name='product_update'),
-    path('delete/<int:pk>/', views.product_delete, name='product_delete'),
-
+    path('', include('inventory.urls')),
 ]

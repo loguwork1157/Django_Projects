@@ -2,6 +2,17 @@
 {% block title %}Product List{% endblock %}
 {% block content %}
 <h1>Inventory</h1>
+<p><strong>Welcome, {{ request.session.custom_name|default:request.user.username }}</strong></p>
+<p>Your total visits to this page: {{ visit_count }}</p>
+
+<!-- Session Name Override Form -->
+<form method="POST" action="{% url 'set_session_name' %}" style="margin-bottom: 20px;">
+  {% csrf_token %}
+  <input type="text" name="custom_name" placeholder="Enter session name"
+    value="{{ request.session.custom_name|default:'' }}">
+  <button type="submit">Change Session Name</button>
+</form>
+
 <a class="button" href="{% url 'product_create' %}">➕ Add New Product</a>
 <br><br>
 <table>
@@ -13,7 +24,7 @@
     <th>Description</th>
     <th>Actions</th>
   </tr>
-  {% for p in products %}
+  {% for p in page_obj %}
   <tr>
     <td>{{ p.id }}</td>
     <td>{{ p.name }}</td>
@@ -31,46 +42,22 @@
   </tr>
   {% endfor %}
 </table>
+
+<div class="pagination">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+    <a href="?page=1">&laquo; first</a>
+    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </span>
+</div>
 {% endblock %}
-
-<html>
-
-<head>
-  <title>Inventory Management</title>
-</head>
-
-<body>
-  <h1>Inventory</h1>
-  <a href="{% url 'product_create' %}">➕ Add New Product</a>
-  <br><br>
-
-  <table border="1" cellpadding="6">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Quantity</th>
-      <th>Price</th>
-      <th>Description</th>
-      <th>Actions</th>
-    </tr>
-    {% for p in products %}
-    <tr>
-      <td>{{ p.id }}</td>
-      <td>{{ p.name }}</td>
-      <td>{{ p.quantity }}</td>
-      <td>{{ p.price }}</td>
-      <td>{{ p.description}}</td>
-      <td>
-        <a href="{% url 'product_update' p.id %}">Edit</a> |
-        <a href="{% url 'product_delete' p.id %}">Delete</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="5">No products found.</td>
-    </tr>
-    {% endfor %}
-  </table>
-</body>
-
-</html>
